@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #09090F;
+  --s1: #111118;
+  --s2: #18181F;
+  --s3: #1E1E2C;
+  --or: #F97316;
+  --orl: #FB923C;
+  --ord: rgba(249,115,22,0.11);
+  --orb: rgba(249,115,22,0.25);
+  --gd: #FBBF24;
+  --gdd: rgba(251,191,36,0.10);
+  --gdb: rgba(251,191,36,0.22);
+  --tl: #34D399;
+  --tld: rgba(52,211,153,0.10);
+  --tlb: rgba(52,211,153,0.22);
+  --t: #F0EFE8;
+  --ts: #7A7A8A;
+  --tm: #444455;
+  --b: rgba(255,255,255,0.07);
+  --bs: rgba(255,255,255,0.13);
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  background: #09090F;
+  color: #F0EFE8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* /overlay/[username] only — see src/app/overlay/[username]/layout.tsx,
+   which is the only place this class is applied. Keeps this app-wide
+   stylesheet from accidentally affecting any other page. */
+.overlay-root {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+p, span, h1, h2, h3, h4, h5, h6, label, a {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+button, a { min-height: 44px; }
+
+input, textarea, select {
+  background: var(--s1);
+  border: 1.5px solid var(--b);
+  border-radius: 10px;
+  color: var(--t);
+  padding: 13px 15px;
+  font-size: 15px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--or);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--tm);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+@keyframes alertIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}

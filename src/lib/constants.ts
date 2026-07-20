@@ -1,0 +1,10 @@
+export const APP_NAME = 'Tipflow'
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL!
+export const WS_URL = process.env.NEXT_PUBLIC_WS_URL!
+export const ARBITRUM_CHAIN_ID = 42161
+export const ARBITRUM_RPC = `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+export const USDC_ARBITRUM = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'
+export const USDT_ARBITRUM = '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'
+export const PRESET_AMOUNTS = [1, 3, 5, 10]
+export const MIN_TIP = 1
+export const MAX_TIP = 500
