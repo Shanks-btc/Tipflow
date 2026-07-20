@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { WS_URL } from '@/lib/constants'
 
@@ -8,7 +8,7 @@ type CheckStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
 const USERNAME_PATTERN = /^[a-z0-9-]+$/i
 
-export default function SetupPage() {
+function SetupContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   // Set by /login's redirect (router.push(`/setup?email=...`)) right after
@@ -225,5 +225,36 @@ export default function SetupPage() {
         )}
       </div>
     </main>
+  )
+}
+
+export default function SetupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: '100vh',
+            background: '#09090F',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              border: '2.5px solid rgba(249,115,22,0.2)',
+              borderTopColor: '#F97316',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+        </div>
+      }
+    >
+      <SetupContent />
+    </Suspense>
   )
 }
