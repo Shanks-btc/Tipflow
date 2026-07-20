@@ -28,9 +28,8 @@ function ShieldIcon() {
 const FEATURES = [
   {
     icon: <GlobeIcon />,
-    title: '195 countries, zero restrictions',
-    description:
-      'A fan in Manila. Lagos. São Paulo. None of them could tip you before. No PayPal blocks. No Bits. Just email.',
+    title: 'Works everywhere',
+    description: 'Fans authenticate with email from any country. No banking rails, no PayPal restrictions, no blocked regions.',
   },
   {
     icon: <BoltIcon />,
@@ -40,8 +39,8 @@ const FEATURES = [
   },
   {
     icon: <ShieldIcon />,
-    title: 'Zero platform cut',
-    description: 'Twitch keeps 50%. StreamElements takes a share. Tipflow charges 1% to keep the lights on. That is it.',
+    title: 'Transparent pricing',
+    description: 'Tipflow charges 1% on successful tips. No monthly subscription. No hidden fees. Withdraw any time.',
   },
 ]
 

@@ -43,12 +43,13 @@ export default function LoginPage() {
   const handleVerify = async () => {
     setError(null)
     try {
-      const address = await magicAuth.verifyOTP(digits.join(''))
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, email }),
-      })
+      await magicAuth.verifyOTP(email, digits.join(''))
+      // /api/auth/login no longer takes a client-supplied address — it
+      // reads the caller's verified Supabase session directly and derives
+      // the same deterministic wallet server-side (see
+      // lib/walletDerivation.ts), so there's nothing left for the client
+      // to assert here.
+      const res = await fetch('/api/auth/login', { method: 'POST' })
       const data = await res.json()
       // tipflow_session only holds the wallet address — /setup needs email
       // too (to create the streamers row on first login), so it rides
@@ -82,8 +83,13 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={otpSent}
-          className="mb-4"
+          className="mb-2"
         />
+        {!otpSent && (
+          <p className="mb-4 text-xs text-[var(--ts)]">
+            We will send a 6-digit code to your email. No wallet or password required.
+          </p>
+        )}
 
         {!otpSent ? (
           <button

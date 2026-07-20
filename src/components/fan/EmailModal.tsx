@@ -8,7 +8,7 @@ interface EmailModalProps {
   loading?: boolean
 }
 
-// Real Magic email OTP login. onContinue (implemented in TipCard) calls
+// Supabase email OTP login. onContinue (implemented in TipCard) calls
 // useMagicAuth().sendOTP(email) — this component just owns the input UI
 // and shows a loading state while that request is in flight.
 export function EmailModal({ amount, streamerName, email, onEmailChange, onContinue, onBack, loading }: EmailModalProps) {
@@ -23,9 +23,23 @@ export function EmailModal({ amount, streamerName, email, onEmailChange, onConti
         <span className="text-orange text-xl">✉</span>
       </div>
       <h2 className="text-xl font-extrabold text-[var(--t)]">Where do we send your receipt?</h2>
-      <p className="mt-1 mb-5 text-sm text-[var(--ts)]">
-        Confirming your ${amount} tip to {streamerName}
-      </p>
+      <p className="mt-1 mb-4 text-sm text-[var(--ts)]">One more step before it&apos;s on its way</p>
+
+      <div className="bg-s1 border border-[var(--b)] rounded-lg p-3 mb-5 text-left">
+        <div className="flex justify-between text-sm py-1">
+          <span className="text-[var(--ts)]">You send</span>
+          <span className="text-[var(--t)] font-semibold">${amount}</span>
+        </div>
+        <div className="flex justify-between text-sm py-1">
+          <span className="text-[var(--ts)]">To</span>
+          <span className="text-[var(--t)] font-semibold">{streamerName}</span>
+        </div>
+        <div className="flex justify-between text-sm py-1">
+          <span className="text-[var(--ts)]">Network</span>
+          <span className="text-orange font-semibold">Arbitrum</span>
+        </div>
+      </div>
+
       <input
         type="email"
         inputMode="email"

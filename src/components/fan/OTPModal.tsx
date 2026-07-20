@@ -8,9 +8,9 @@ interface OTPModalProps {
   loading?: boolean
 }
 
-// Real Magic OTP verification. onVerify (implemented in TipCard) calls
-// useMagicAuth().verifyOTP(otp), which resolves the fan's Magic wallet
-// address and moves the flow on to sending.
+// Supabase OTP verification. onVerify (implemented in TipCard) calls
+// useMagicAuth().verifyOTP(email, otp), which resolves the fan's
+// deterministic wallet address and moves the flow on to sending.
 export function OTPModal({ email, onVerify, onResend, loading }: OTPModalProps) {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const refs = useRef<(HTMLInputElement | null)[]>([])

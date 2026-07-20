@@ -1,8 +1,8 @@
 const STATS = [
-  { value: '$3.1M+', label: 'Paid to creators' },
-  { value: '8s', label: 'Avg tip speed' },
-  { value: '195', label: 'Countries' },
-  { value: '0%', label: 'Platform cut' },
+  { value: 'Email only', label: 'No seed phrase required' },
+  { value: 'One balance', label: 'Assets across supported chains' },
+  { value: 'USDC payouts', label: 'Creators receive on Arbitrum' },
+  { value: 'Live alerts', label: 'OBS-ready notifications' },
 ]
 
 export function StatsBar() {
@@ -15,7 +15,7 @@ export function StatsBar() {
               key={stat.label}
               className={`text-center ${i < STATS.length - 1 ? 'border-r border-[var(--b)]' : ''}`}
             >
-              <div className="text-[36px] font-black text-orange">{stat.value}</div>
+              <div className="text-[16px] font-bold text-[var(--t)]">{stat.value}</div>
               <div className="mt-1 text-[11px] uppercase tracking-widest text-[var(--ts)]">{stat.label}</div>
             </div>
           ))}

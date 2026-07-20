@@ -3,7 +3,7 @@ import { APP_NAME } from '@/lib/constants'
 const NAV_LINKS = [
   { label: 'How it works', href: '#how-it-works' },
   { label: 'For streamers', href: '#for-streamers' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Pricing', href: '#fee-comparison' },
 ]
 
 export function Navbar() {

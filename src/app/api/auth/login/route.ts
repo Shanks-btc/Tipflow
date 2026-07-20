@@ -1,27 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { createServiceRoleClient } from '@/lib/supabase-server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase-server'
+import { deriveWalletFromUserId } from '@/lib/walletDerivation'
 
-// MVP shortcut, not hardened auth: trusts the client-resolved Magic address
-// rather than cryptographically verifying a DID token server-side (that
-// needs @magic-sdk/admin, not installed). Good enough to demo the
-// protected-route pattern and qualify the OTP flow for the Magic bonus;
-// revisit with real DID verification before this touches real user funds
-// beyond the hackathon demo.
-export async function POST(request: NextRequest) {
-  const body = await request.json()
-  const { address, email } = body as { address?: string; email?: string }
+// Verifies the caller against their live Supabase session (set by
+// supabase.auth.verifyOtp() on the client just before this is called) —
+// no client-supplied address or email is trusted. The session's user id
+// is the only input to both the wallet address (same deterministic
+// derivation as /api/auth/wallet) and the streamer lookup (via the
+// session's own verified email), so this can only ever act on the
+// caller's own identity.
+export async function POST() {
+  const supabase = createClient()
+  const { data, error } = await supabase.auth.getUser()
 
-  if (!address || !email) {
-    return NextResponse.json({ error: 'Missing address or email' }, { status: 400 })
+  if (error || !data.user) {
+    return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
   }
 
-  const supabase = createServiceRoleClient()
-  const { data: streamer } = await supabase
-    .from('streamers')
-    .select('id, username')
-    .eq('email', email)
-    .single()
+  const { address } = deriveWalletFromUserId(data.user.id)
+  const email = data.user.email
+
+  const supabaseAdmin = createServiceRoleClient()
+  const { data: streamer } = email
+    ? await supabaseAdmin.from('streamers').select('id, username').eq('email', email).single()
+    : { data: null }
 
   const cookieStore = cookies()
   cookieStore.set('tipflow_session', address, {

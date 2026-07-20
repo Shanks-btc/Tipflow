@@ -38,7 +38,7 @@ export function useTipFlow(streamerUA: string) {
     async (otp: string) => {
       setError(null)
       try {
-        const address = await magicAuth.verifyOTP(otp)
+        const address = await magicAuth.verifyOTP(email, otp)
         setFanAddress(address)
         setState('sending')
 

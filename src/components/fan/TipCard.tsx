@@ -7,10 +7,21 @@ import StreamerCard from './StreamerCard'
 import AmountSelector from './AmountSelector'
 import EmailModal from './EmailModal'
 import OTPModal from './OTPModal'
-import SendingState from './SendingState'
+import SendingState, { type SendPhase } from './SendingState'
 import SuccessState from './SuccessState'
 
 type TipCardStep = 'select' | 'email' | 'otp' | 'sending' | 'success' | 'error'
+
+// Maps useParticleUA's raw onProgress messages (EIP-7702 authorization,
+// Universal Account internals, etc.) to the three fan-facing phases
+// SendingState shows — keeps that component's "no crypto jargon" rule
+// intact while still giving real, live-updating feedback instead of a
+// static message for the whole send.
+function mapSendPhase(message: string): SendPhase {
+  if (message.includes('Submitting') || message.includes('submitted')) return 'sending'
+  if (message.includes('Signing') || message.includes('Building transfer')) return 'confirming'
+  return 'preparing'
+}
 
 const PROGRESS_STEPS: Exclude<TipCardStep, 'error'>[] = ['select', 'email', 'otp', 'sending', 'success']
 
@@ -33,6 +44,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [authError, setAuthError] = useState<string | null>(null)
+  const [sendPhase, setSendPhase] = useState<SendPhase>('preparing')
 
   // Guards against double-sending — verifyOTP resolves once, but this keeps
   // a retry from firing a second real transaction.
@@ -58,7 +70,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
   const handleVerifyOTP = async (otp: string) => {
     setAuthError(null)
     try {
-      await magicAuth.verifyOTP(otp)
+      await magicAuth.verifyOTP(email, otp)
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Failed to verify the code')
       return
@@ -74,6 +86,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
     }
 
     setError(null)
+    setSendPhase('preparing')
     setStep('sending')
     const startedAt = Date.now()
     try {
@@ -82,6 +95,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
         signer,
         streamerUA: initialStreamer.ua_address,
         amountUsd: amount,
+        onProgress: (message) => setSendPhase(mapSendPhase(message)),
       })
       setTxHash(id)
       setElapsedSeconds(Math.round((Date.now() - startedAt) / 1000))
@@ -124,17 +138,6 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
     setStep('select')
   }
 
-  // Explicit-only, per the DEV MODE banner's "Clear wallet" button — never
-  // triggered automatically.
-  const handleClearFallbackWallet = () => {
-    magicAuth.clearFallbackWallet()
-    hasSentRef.current = false
-    setStep('select')
-    setAmount(null)
-    setEmail('')
-    setAuthError(null)
-  }
-
   const stepIndex = step === 'error' ? PROGRESS_STEPS.indexOf('otp') : PROGRESS_STEPS.indexOf(step)
 
   if (!initialStreamer) {
@@ -172,39 +175,6 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
         </div>
       )}
 
-      {magicAuth.usingFallback && step === 'otp' && (
-        <div className="mb-4 rounded-lg border border-[var(--orb)] bg-orange-dim text-center overflow-hidden">
-          <div className="p-2 text-orange text-[11px]">
-            <div>DEV MODE — Magic timed out, reusing your persisted local test wallet (localhost only)</div>
-            {magicAuth.fallbackAddress && (
-              <>
-                <div className="mt-1 text-[var(--tm)] uppercase" style={{ letterSpacing: '0.06em' }}>Address (same every time)</div>
-                <div className="font-mono break-all select-all">{magicAuth.fallbackAddress}</div>
-              </>
-            )}
-            <div className="mt-1 text-[var(--tm)]">Fund this address once with a small amount of ETH on Arbitrum — it persists until you clear it</div>
-          </div>
-
-          {magicAuth.fallbackPrivateKey && (
-            <div className="p-2 border-t border-red-500/30 bg-red-500/10 text-left">
-              <div className="text-red-300 text-[10px] uppercase font-bold text-center" style={{ letterSpacing: '0.06em' }}>
-                Private key — test only, never use in production
-              </div>
-              <div className="mt-1 font-mono text-red-300 text-[10px] break-all select-all">
-                {magicAuth.fallbackPrivateKey}
-              </div>
-            </div>
-          )}
-
-          <button
-            onClick={handleClearFallbackWallet}
-            className="w-full py-2 text-[11px] font-semibold text-[var(--ts)] border-t border-[var(--b)] hover:text-[var(--t)]"
-          >
-            Clear wallet
-          </button>
-        </div>
-      )}
-
       {step === 'select' && (
         <div>
           <StreamerCard displayName={displayName} />
@@ -229,7 +199,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
       )}
 
       {step === 'sending' && amount !== null && (
-        <SendingState amount={amount} streamerName={displayName} />
+        <SendingState amount={amount} streamerName={displayName} phase={sendPhase} />
       )}
 
       {step === 'success' && amount !== null && txHash && (
