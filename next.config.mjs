@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   experimental: {
     // Tree-shakes barrel-file imports so only the specific named exports
     // actually used end up in the client bundle, instead of the whole
