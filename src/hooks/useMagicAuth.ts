@@ -26,6 +26,15 @@ export function useMagicAuth() {
     setError(null)
     try {
       const supabase = createClient()
+      // emailRedirectTo is intentionally omitted (not merely undefined —
+      // see below) so Supabase has no confirmation link to build from the
+      // client side. That alone doesn't guarantee a code-only email: the
+      // active email template in the Supabase dashboard is what actually
+      // decides whether {{ .ConfirmationURL }} (a link) or {{ .Token }}
+      // (the 6-digit code) gets shown — see Authentication → Email
+      // Templates. A template referencing .ConfirmationURL will still
+      // render a link even with no emailRedirectTo here, because Supabase
+      // falls back to the project's configured Site URL.
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email,
         options: { shouldCreateUser: true },
