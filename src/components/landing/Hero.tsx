@@ -214,10 +214,24 @@ export function Hero() {
               </span>
             ))}
           </div>
+
+          {/* Tablet (768-1023px): full card, no alert, stacked below the CTAs. */}
+          <div className="hidden md:block lg:hidden max-w-[390px] mx-auto" style={{ marginTop: 40 }}>
+            <TipCardPreview />
+          </div>
+
+          {/* Mobile (<768px): reduced card, stacked below the CTAs. */}
+          <div className="md:hidden" style={{ marginTop: 32 }}>
+            <MobileTipCardPreview />
+          </div>
         </div>
 
-        <div className="lg:w-[48%] mt-10 lg:mt-0">
-          <ProductPreview />
+        {/* Desktop (1024px+): full card + floating alert, beside the text. */}
+        <div className="hidden lg:block lg:w-[48%]">
+          <div className="relative w-full max-w-[380px] mx-auto" style={{ minHeight: 360 }}>
+            <TipCardPreview />
+            <AlertCardPreview />
+          </div>
         </div>
       </div>
     </section>
