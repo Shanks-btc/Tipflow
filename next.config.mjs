@@ -7,6 +7,16 @@ const nextConfig = {
     // package.
     optimizePackageImports: ['@particle-network/universal-account-sdk'],
   },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/websocket-server/**'],
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
