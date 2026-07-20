@@ -55,7 +55,7 @@ export function useTipFlow(streamerUA: string) {
         setState('error')
       }
     },
-    [amount, magicAuth, particleUA, streamerUA]
+    [amount, email, magicAuth, particleUA, streamerUA]
   )
 
   const executeTip = useCallback(async () => {
