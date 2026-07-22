@@ -4,6 +4,17 @@ import { useRouter } from 'next/navigation'
 import { useMagicAuth } from '@/hooks/useMagicAuth'
 import { APP_NAME } from '@/lib/constants'
 
+// This route has no server-side data dependency, so Next.js treats it as
+// fully static and (per the production Cache-Control header we observed:
+// `s-maxage=31536000, stale-while-revalidate`) it can be cached at
+// Railway's edge layer for up to a year. That's independent of any
+// visiting device's own cache — a stale edge-cached snapshot from an
+// earlier, since-fixed deploy can keep being served to new visitors long
+// after the underlying code is corrected. Forcing dynamic rendering
+// removes /login from that static-caching path entirely, so it's always
+// served fresh from the current deployment.
+export const dynamic = 'force-dynamic'
+
 export default function LoginPage() {
   const router = useRouter()
   const magicAuth = useMagicAuth()
@@ -13,6 +24,13 @@ export default function LoginPage() {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState<string | null>(null)
   const refs = useRef<(HTMLInputElement | null)[]>([])
+
+  // Safety: ensure error is always a displayable string
+  const displayError = error &&
+    typeof error === 'string' &&
+    error !== '{}' &&
+    error !== '[object Object]' &&
+    error.length > 0 ? error : null
 
   const handleSendOTP = async () => {
     if (!email) return
@@ -70,11 +88,25 @@ export default function LoginPage() {
         </div>
         <h1 className="text-xl font-extrabold text-[var(--t)] text-center mb-6">Sign in to your account</h1>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-lg border border-red-500/40 bg-red-500/10 text-red-300 text-xs font-mono whitespace-pre-wrap break-all">
-            {error}
-          </div>
-        )}
+        {displayError &&
+          typeof displayError === 'string' &&
+          displayError.length > 0 &&
+          displayError !== '{}' &&
+          displayError !== '[object Object]' && (
+            <div
+              style={{
+                background: 'rgba(249,115,22,0.1)',
+                border: '1px solid rgba(249,115,22,0.25)',
+                borderRadius: '10px',
+                padding: '12px 16px',
+                color: 'var(--or)',
+                fontSize: '13px',
+                marginBottom: '16px',
+              }}
+            >
+              {displayError}
+            </div>
+          )}
 
         <input
           type="email"
