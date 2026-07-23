@@ -12,7 +12,6 @@ export default function TypewriterText({
 }) {
   const [displayed, setDisplayed] = useState('')
   const [showCursor, setShowCursor] = useState(true)
-  const [done, setDone] = useState(false)
 
   useEffect(() => {
     let i = 0
@@ -22,7 +21,6 @@ export default function TypewriterText({
         i++
       } else {
         clearInterval(timer)
-        setDone(true)
       }
     }, delay)
     return () => clearInterval(timer)

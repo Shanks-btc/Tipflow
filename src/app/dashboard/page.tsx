@@ -1,10 +1,31 @@
 import { getSessionStreamer } from '@/lib/streamers'
 import { getStreamerStats } from '@/lib/tips'
+import { createServiceRoleClient } from '@/lib/supabase-server'
+import DashboardNav from '@/components/dashboard/DashboardNav'
+import ProfileCard from '@/components/dashboard/ProfileCard'
 import StatCard from '@/components/dashboard/StatCard'
 import BalanceCard from '@/components/dashboard/BalanceCard'
 import TipLinkCard from '@/components/dashboard/TipLinkCard'
 import OverlayCard from '@/components/dashboard/OverlayCard'
-import TipFeed from '@/components/dashboard/TipFeed'
+import TipTable from '@/components/dashboard/TipTable'
+
+// alert_duration/min_tip_amount live on the streamers row (see
+// supabase/migrations/003_streamer_settings.sql) but are queried separately
+// from getSessionStreamer() — if that migration hasn't been applied yet in
+// a given environment, this query fails in isolation and falls back to
+// defaults instead of breaking the whole dashboard.
+async function getStreamerSettings(streamerId: string): Promise<{ alertDuration: number; minTipAmount: number }> {
+  const defaults = { alertDuration: 5, minTipAmount: 1 }
+  if (streamerId.startsWith('mock-')) return defaults
+
+  const supabase = createServiceRoleClient()
+  const { data } = await supabase.from('streamers').select('alert_duration, min_tip_amount').eq('id', streamerId).single()
+
+  return {
+    alertDuration: data?.alert_duration ?? defaults.alertDuration,
+    minTipAmount: data?.min_tip_amount ?? defaults.minTipAmount,
+  }
+}
 
 // Route protection itself is handled by middleware.ts (redirects to /login
 // if no tipflow_session cookie). getSessionStreamer() reads that same
@@ -15,19 +36,30 @@ import TipFeed from '@/components/dashboard/TipFeed'
 export default async function DashboardPage() {
   const { streamer, isDemo } = await getSessionStreamer()
   const stats = await getStreamerStats(streamer.id)
+  const { alertDuration, minTipAmount } = await getStreamerSettings(streamer.id)
 
   return (
     <main className="min-h-screen bg-bg">
+      <DashboardNav
+        username={streamer.username}
+        displayName={streamer.display_name}
+        alertDuration={alertDuration}
+        minTipAmount={minTipAmount}
+      />
+
       <div className="max-w-[960px] mx-auto p-4 sm:p-6">
-        <div className="mb-6">
-          <h1 className="text-xl font-extrabold text-[var(--t)]">{streamer.display_name}</h1>
-          <p className="text-sm text-[var(--ts)]">@{streamer.username}</p>
-          {isDemo && (
-            <span className="inline-block mt-2 bg-orange-dim border border-[var(--orb)] text-orange rounded-full px-2.5 py-1 text-[11px] uppercase">
-              Demo data — log in to see your own dashboard
-            </span>
-          )}
-        </div>
+        {isDemo && (
+          <span className="inline-block mb-4 bg-orange-dim border border-[var(--orb)] text-orange rounded-full px-2.5 py-1 text-[11px] uppercase">
+            Demo data — log in to see your own dashboard
+          </span>
+        )}
+
+        <ProfileCard
+          displayName={streamer.display_name}
+          username={streamer.username}
+          alertDuration={alertDuration}
+          minTipAmount={minTipAmount}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <StatCard
@@ -51,11 +83,14 @@ export default async function DashboardPage() {
         <BalanceCard ownerAddress={streamer.ua_address} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <TipLinkCard username={streamer.username} />
-          <OverlayCard username={streamer.username} />
+          <div className="flex flex-col gap-4">
+            <TipLinkCard username={streamer.username} />
+            <OverlayCard username={streamer.username} />
+          </div>
+          <div className="hidden md:block" />
         </div>
 
-        <TipFeed streamerId={streamer.id} />
+        <TipTable streamerId={streamer.id} username={streamer.username} />
       </div>
     </main>
   )
