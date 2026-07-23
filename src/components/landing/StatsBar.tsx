@@ -13,7 +13,7 @@ export function StatsBar() {
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className={`text-center ${i < STATS.length - 1 ? 'border-r border-[var(--b)]' : ''}`}
+              className={`text-center animate-fade-up animate-fade-up-${i + 1} ${i < STATS.length - 1 ? 'border-r border-[var(--b)]' : ''}`}
             >
               <div className="text-[16px] font-bold text-[var(--t)]">{stat.value}</div>
               <div className="mt-1 text-[11px] uppercase tracking-widest text-[var(--ts)]">{stat.label}</div>

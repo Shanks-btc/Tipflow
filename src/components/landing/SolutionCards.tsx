@@ -1,5 +1,8 @@
 'use client'
+import { useInView } from '@/hooks/useInView'
+
 export default function SolutionCards() {
+  const { ref, inView } = useInView()
   const solutions = [
     {
       title: 'Email-only onboarding',
@@ -38,7 +41,7 @@ export default function SolutionCards() {
   ]
 
   return (
-    <section className="py-12 md:py-20" style={{ background: 'var(--bg)' }}>
+    <section ref={ref} className="py-12 md:py-20" style={{ background: 'var(--bg)' }}>
       <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
@@ -65,7 +68,7 @@ export default function SolutionCards() {
           We rebuilt tipping from scratch using Magic, Particle Universal Accounts and Arbitrum.
         </p>
         <div className="grid grid-cols-1 min-[640px]:grid-cols-3" style={{ gap: '16px' }}>
-          {solutions.map((s) => (
+          {solutions.map((s, index) => (
             <div
               key={s.title}
               style={{
@@ -77,6 +80,9 @@ export default function SolutionCards() {
                 flexDirection: 'column',
                 position: 'relative',
                 overflow: 'hidden',
+                opacity: inView ? 1 : 0,
+                transform: inView ? 'translateY(0)' : 'translateY(24px)',
+                transition: `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`,
               }}
             >
               <div

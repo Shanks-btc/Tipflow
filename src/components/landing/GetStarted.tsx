@@ -1,8 +1,10 @@
 'use client'
 import { Fragment } from 'react'
 import Link from 'next/link'
+import { useInView } from '@/hooks/useInView'
 
 export default function GetStarted() {
+  const { ref, inView } = useInView()
   const steps = [
     {
       n: '1',
@@ -22,7 +24,11 @@ export default function GetStarted() {
   ]
 
   return (
-    <section className="py-12 md:py-20" style={{ background: 'var(--s1)', borderTop: '1px solid var(--b)' }}>
+    <section
+      ref={ref}
+      className={`py-12 md:py-20 ${inView ? 'section-visible' : 'section-hidden'}`}
+      style={{ background: 'var(--s1)', borderTop: '1px solid var(--b)' }}
+    >
       <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
@@ -99,6 +105,7 @@ export default function GetStarted() {
         <div style={{ textAlign: 'center' }}>
           <Link
             href="/login"
+            className="btn-primary"
             style={{
               display: 'inline-block',
               background: 'var(--or)',

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 const NAV_LINKS = [
@@ -10,15 +10,25 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    onScroll()
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <nav
       style={{
-        background: 'var(--s1)',
+        background: scrolled ? 'rgba(17,17,24,0.85)' : 'var(--s1)',
+        backdropFilter: scrolled ? 'blur(10px)' : 'none',
         borderBottom: '1px solid var(--b)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
+        transition: 'background 0.2s ease, backdrop-filter 0.2s ease',
       }}
     >
       <div
@@ -57,6 +67,7 @@ export default function Navbar() {
           </Link>
           <Link
             href="/login"
+            className="btn-primary"
             style={{
               background: 'var(--or)',
               color: '#fff',
@@ -75,6 +86,7 @@ export default function Navbar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} className="show-mobile">
           <Link
             href="/login"
+            className="btn-primary"
             style={{
               background: 'var(--or)',
               color: '#fff',

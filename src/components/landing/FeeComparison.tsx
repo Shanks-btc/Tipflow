@@ -1,5 +1,8 @@
 'use client'
+import { useInView } from '@/hooks/useInView'
+
 export default function FeeComparison() {
+  const { ref, inView } = useInView()
   const rows = [
     {
       platform: 'Tipflow',
@@ -32,7 +35,12 @@ export default function FeeComparison() {
   ]
 
   return (
-    <section id="fee-comparison" className="py-12 md:py-20" style={{ background: 'var(--s1)' }}>
+    <section
+      ref={ref}
+      id="fee-comparison"
+      className={`py-12 md:py-20 ${inView ? 'section-visible' : 'section-hidden'}`}
+      style={{ background: 'var(--s1)' }}
+    >
       <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{

@@ -1,5 +1,8 @@
 'use client'
+import { useInView } from '@/hooks/useInView'
+
 export default function ProblemStatement() {
+  const { ref, inView } = useInView()
   const problems = [
     {
       title: 'Geo-blocked payments',
@@ -35,7 +38,7 @@ export default function ProblemStatement() {
   ]
 
   return (
-    <section className="py-12 md:py-20" style={{ background: '#0D0D14' }}>
+    <section ref={ref} className="py-12 md:py-20" style={{ background: '#0D0D14' }}>
       <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
@@ -62,7 +65,7 @@ export default function ProblemStatement() {
           Fans want to support their favourite creators. The platforms make it nearly impossible.
         </p>
         <div className="grid grid-cols-1 min-[640px]:grid-cols-3" style={{ gap: '16px', marginBottom: '48px' }}>
-          {problems.map((p) => (
+          {problems.map((p, index) => (
             <div
               key={p.title}
               style={{
@@ -70,6 +73,9 @@ export default function ProblemStatement() {
                 border: '1px solid rgba(239,68,68,0.15)',
                 borderRadius: '12px',
                 padding: '24px',
+                opacity: inView ? 1 : 0,
+                transform: inView ? 'translateY(0)' : 'translateY(24px)',
+                transition: `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`,
               }}
             >
               <div

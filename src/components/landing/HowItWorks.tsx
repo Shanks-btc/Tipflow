@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useInView } from '@/hooks/useInView'
 
 const CREATOR_STEPS = [
   {
@@ -40,9 +41,15 @@ const FAN_STEPS = [
 export function HowItWorks() {
   const [activeTab, setActiveTab] = useState<'fans' | 'creators'>('fans')
   const steps = activeTab === 'fans' ? FAN_STEPS : CREATOR_STEPS
+  const { ref, inView } = useInView()
 
   return (
-    <section id="how-it-works" className="py-14 md:py-20" style={{ background: '#0D0D14' }}>
+    <section
+      ref={ref}
+      id="how-it-works"
+      className={`py-14 md:py-20 ${inView ? 'section-visible' : 'section-hidden'}`}
+      style={{ background: '#0D0D14' }}
+    >
       <div className="mx-auto max-w-[1280px] px-4">
         <h2 className="text-[28px] font-extrabold text-[var(--t)] text-center mb-6">
           Three steps to your first global tip

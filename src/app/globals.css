@@ -106,6 +106,51 @@ input::placeholder, textarea::placeholder {
   50% { opacity: 0.5; transform: scale(1.3); }
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+.animate-fade-up-1 { animation-delay: 0.1s; }
+.animate-fade-up-2 { animation-delay: 0.2s; }
+.animate-fade-up-3 { animation-delay: 0.3s; }
+.animate-fade-up-4 { animation-delay: 0.4s; }
+
+.section-hidden {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.section-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+.btn-primary {
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+.btn-primary:hover {
+  transform: scale(1.02);
+  opacity: 0.95;
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
 /* Navbar.tsx desktop/mobile toggle — .show-mobile also sets its own
    flexDirection inline where it needs vertical stacking (the dropdown
    menu), since this rule only controls display, not layout direction. */

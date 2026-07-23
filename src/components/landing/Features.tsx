@@ -1,3 +1,6 @@
+'use client'
+import { useInView } from '@/hooks/useInView'
+
 function GlobeIcon() {
   return (
     <svg viewBox="0 0 24 24" width={24} height={24} fill="none" stroke="#F97316" strokeWidth={2}>
@@ -45,8 +48,13 @@ const FEATURES = [
 ]
 
 export function Features() {
+  const { ref, inView } = useInView()
   return (
-    <section id="for-streamers" className="py-14 md:py-20">
+    <section
+      ref={ref}
+      id="for-streamers"
+      className={`py-14 md:py-20 ${inView ? 'section-visible' : 'section-hidden'}`}
+    >
       <div className="mx-auto max-w-[1280px] px-4">
         <div className="text-center mb-8">
           <h2 className="text-[28px] font-extrabold text-[var(--t)]">Built for the creator economy</h2>

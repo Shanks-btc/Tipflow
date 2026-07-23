@@ -1,4 +1,7 @@
+'use client'
+import { useEffect, useState } from 'react'
 import LiveDot from '@/components/shared/LiveDot'
+import TypewriterText from './TypewriterText'
 
 // Decorative only — a static mockup of the real fan tip page (StreamerCard,
 // AmountSelector, TipCard's send button) and OBS alert (AlertCard.tsx),
@@ -10,9 +13,9 @@ import LiveDot from '@/components/shared/LiveDot'
 // which breakpoints show which):
 //   - Desktop (lg+): full card + floating alert card, side-by-side with
 //     the headline text.
-//   - Tablet (md-lg): the same full card, no alert card, stacked below
-//     the CTAs instead of beside the text.
-//   - Mobile (<md): no product preview at all — text-only hero.
+//   - Below lg (mobile + tablet, <1024px): a simplified card (no "choose
+//     an amount" label, no alert card), stacked below the CTAs instead of
+//     beside the text.
 
 function StreamerRow() {
   return (
@@ -73,6 +76,76 @@ function SendButton() {
   )
 }
 
+// Below lg (mobile + tablet) — simplified card, visible below the CTAs.
+// Distinct sizing from StreamerRow/AmountGrid above (40px avatar not
+// 44px, 18px amount font not 20px), so built as its own self-contained
+// component rather than parameterizing the shared ones for two callers.
+function MobileTipCardPreview() {
+  return (
+    <div
+      className="rounded-2xl"
+      style={{
+        background: '#18181F',
+        border: '1px solid rgba(255,255,255,0.07)',
+        borderRadius: '16px',
+        padding: '20px',
+        maxWidth: '100%',
+      }}
+    >
+      <div
+        className="rounded-xl mb-4"
+        style={{
+          background: 'rgba(249,115,22,0.11)',
+          border: '1px solid rgba(249,115,22,0.25)',
+          padding: '14px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+        }}
+      >
+        <div
+          className="rounded-full flex items-center justify-center shrink-0"
+          style={{ width: 40, height: 40, background: '#F97316' }}
+        >
+          <span className="text-white font-bold text-[15px]">N</span>
+        </div>
+        <div className="min-w-0">
+          <div className="text-[15px] font-bold text-[var(--t)]">NightOwl</div>
+          <div className="flex items-center gap-1.5 mt-1">
+            <LiveDot />
+            <span className="text-[12px] text-[var(--ts)]">Live · 2.4K watching</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+        {[1, 3, 5, 10].map((amount) => (
+          <div
+            key={amount}
+            className="rounded-[10px] text-center"
+            style={{
+              padding: '12px 0',
+              fontSize: '18px',
+              fontWeight: '900',
+              ...(amount === 5
+                ? { background: 'rgba(249,115,22,0.11)', border: '1px solid rgba(249,115,22,0.25)', color: '#F97316' }
+                : { background: '#111118', border: '1px solid rgba(255,255,255,0.07)', color: 'var(--t)' }),
+            }}
+          >
+            ${amount}
+          </div>
+        ))}
+      </div>
+
+      <SendButton />
+
+      <div className="mt-3 text-center" style={{ fontSize: '11px', color: '#444455' }}>
+        No wallet · No MetaMask · 195 countries
+      </div>
+    </div>
+  )
+}
+
 // Desktop + tablet — full card content.
 function TipCardPreview() {
   return (
@@ -93,7 +166,7 @@ function TipCardPreview() {
   )
 }
 
-function AlertCardPreview() {
+function AlertCardPreview({ visible }: { visible: boolean }) {
   return (
     <div
       className="absolute -bottom-6 -right-6"
@@ -105,6 +178,9 @@ function AlertCardPreview() {
         padding: '14px 18px',
         width: 240,
         overflow: 'hidden',
+        transform: visible ? 'translateX(0)' : 'translateX(120%)',
+        opacity: visible ? 1 : 0,
+        transition: 'transform 0.5s ease, opacity 0.5s ease',
       }}
     >
       <div style={{ position: 'absolute', left: 0, top: 0, width: 3, height: '100%', background: '#F97316' }} />
@@ -127,6 +203,31 @@ function AlertCardPreview() {
 }
 
 export function Hero() {
+  const [alertVisible, setAlertVisible] = useState(false)
+
+  useEffect(() => {
+    let showTimer: ReturnType<typeof setTimeout>
+    let hideTimer: ReturnType<typeof setTimeout>
+    let loopTimer: ReturnType<typeof setTimeout>
+
+    const cycle = () => {
+      showTimer = setTimeout(() => {
+        setAlertVisible(true)
+        hideTimer = setTimeout(() => {
+          setAlertVisible(false)
+          loopTimer = setTimeout(cycle, 3000)
+        }, 4000)
+      }, 2000)
+    }
+    cycle()
+
+    return () => {
+      clearTimeout(showTimer)
+      clearTimeout(hideTimer)
+      clearTimeout(loopTimer)
+    }
+  }, [])
+
   return (
     <section className="pt-12 pb-12 md:pt-16 md:pb-20">
       <div className="mx-auto max-w-[1280px] px-5 md:px-4 lg:flex lg:items-center lg:gap-12">
@@ -139,7 +240,7 @@ export function Hero() {
               className="w-1.5 h-1.5 rounded-full"
               style={{ background: '#34D399', animation: 'pulseDot 1.6s ease-in-out infinite' }}
             />
-            Powered by Magic · Particle Universal Accounts · Arbitrum
+            Settles on Arbitrum · Instant · Onchain
           </div>
 
           <h1 className="font-extrabold text-[32px] md:text-[36px] lg:text-[48px] leading-[1.05] text-[var(--t)]">
@@ -147,9 +248,11 @@ export function Hero() {
             <br />
             Tips instantly.
             <br />
-            <span className="text-orange" style={{ textShadow: '0 0 40px rgba(249,115,22,0.3)' }}>
-              Zero friction.
-            </span>
+            <TypewriterText
+              text="Zero friction."
+              delay={80}
+              style={{ color: 'var(--or)', textShadow: '0 0 40px rgba(249,115,22,0.3)' }}
+            />
           </h1>
           <p className="mt-4 max-w-[520px] mx-auto lg:mx-0 text-[var(--ts)] text-base">
             No MetaMask. No PayPal. No wallet setup.
@@ -161,7 +264,7 @@ export function Hero() {
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <a
               href="/login"
-              className="w-full sm:w-auto rounded-[10px] py-[14px] px-6 font-bold text-white bg-orange text-center"
+              className="btn-primary w-full sm:w-auto rounded-[10px] py-[14px] px-6 font-bold text-white bg-orange text-center"
             >
               Get your free tip link →
             </a>
@@ -175,42 +278,17 @@ export function Hero() {
           </div>
           <p className="mt-4 text-xs text-[var(--tm)]">Free to start · 1% per tip · Withdraw anytime</p>
 
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '32px', flexWrap: 'wrap' }}
-            className="justify-center lg:justify-start"
-          >
-            <span style={{ fontSize: '12px', color: 'var(--ts)' }}>Built with:</span>
-            {['Particle Network', 'Magic', 'Arbitrum', 'EIP-7702'].map((b) => (
-              <span
-                key={b}
-                style={{
-                  background: 'var(--s1)',
-                  border: '1px solid var(--b)',
-                  borderRadius: '100px',
-                  padding: '6px 14px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: 'var(--ts)',
-                }}
-              >
-                {b}
-              </span>
-            ))}
+          {/* Below lg (mobile + tablet): simplified card, always visible, stacked below the CTAs. */}
+          <div className="lg:hidden" style={{ marginTop: 32 }}>
+            <MobileTipCardPreview />
           </div>
-
-          {/* Tablet (768-1023px): full card, no alert, stacked below the CTAs. */}
-          <div className="hidden md:block lg:hidden max-w-[390px] mx-auto" style={{ marginTop: 40 }}>
-            <TipCardPreview />
-          </div>
-
-          {/* Mobile (<768px): product preview hidden completely — text-only hero. */}
         </div>
 
         {/* Desktop (1024px+): full card + floating alert, beside the text. */}
         <div className="hidden lg:block lg:w-[48%]">
           <div className="relative w-full max-w-[380px] mx-auto" style={{ minHeight: 360 }}>
             <TipCardPreview />
-            <AlertCardPreview />
+            <AlertCardPreview visible={alertVisible} />
           </div>
         </div>
       </div>

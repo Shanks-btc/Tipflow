@@ -93,7 +93,10 @@ export default function LoginPage() {
         <div className="text-center mb-6">
           <span className="text-lg font-extrabold text-[var(--t)]">{APP_NAME}</span>
         </div>
-        <h1 className="text-xl font-extrabold text-[var(--t)] text-center mb-6">Sign in to your account</h1>
+        <h1 className="text-xl font-extrabold text-[var(--t)] text-center mb-2">Get started with Tipflow</h1>
+        <p style={{ fontSize: '13px', color: 'var(--ts)', textAlign: 'center', marginBottom: '20px' }}>
+          New here? Enter your email to create your account. Already a creator? Sign in to your dashboard.
+        </p>
 
         {displayError &&
           typeof displayError === 'string' &&
@@ -136,7 +139,7 @@ export default function LoginPage() {
             disabled={!email || loading}
             className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange disabled:opacity-40 transition-opacity"
           >
-            {loading ? 'Sending…' : 'Continue with email'}
+            {loading ? 'Sending…' : 'Continue with email →'}
           </button>
         ) : (
           <>

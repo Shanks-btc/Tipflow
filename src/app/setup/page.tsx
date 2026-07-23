@@ -158,8 +158,10 @@ function SetupContent() {
 
         {step === 2 && (
           <div>
-            <h1 className="text-xl font-extrabold text-[var(--t)]">Add your stream overlay</h1>
-            <p className="mt-1 mb-5 text-sm text-[var(--ts)]">Paste this URL into OBS as a Browser Source</p>
+            <h1 className="text-xl font-extrabold text-[var(--t)]">Set up your stream alerts</h1>
+            <p className="mt-1 mb-5 text-sm text-[var(--ts)]">
+              When fans tip you, their name appears live on your stream. Add this URL to OBS.
+            </p>
 
             <div className="flex items-center justify-between gap-3 bg-orange-dim border border-[var(--orb)] rounded-[10px] px-4 py-3.5 mb-5">
               <span className="min-w-0 flex-1 font-mono text-orange text-sm overflow-hidden text-ellipsis whitespace-nowrap">
@@ -173,11 +175,11 @@ function SetupContent() {
               </button>
             </div>
 
-            <div className="mb-6 flex flex-col gap-3">
+            <div className="mb-4 flex flex-col gap-3">
               {[
-                'Open OBS → Add Source → Browser Source',
-                'Paste your overlay URL',
-                'Set width: 1920, height: 1080',
+                'Open OBS Studio on your computer',
+                'Add a Browser Source and paste your URL above',
+                'Set size to 1920×1080 and click OK',
               ].map((instruction, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-s1 border border-[var(--b)] flex items-center justify-center text-xs font-bold text-[var(--t)] shrink-0">
@@ -188,27 +190,43 @@ function SetupContent() {
               ))}
             </div>
 
+            <p className="mb-6 text-xs text-[var(--tm)]">
+              Don&apos;t use OBS? Skip this for now — you can set it up later from your dashboard.
+            </p>
+
             <button
               onClick={() => setStep(3)}
               className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange"
             >
               Next
             </button>
+
+            <a
+              href="/dashboard"
+              className="mt-3 block text-center"
+              style={{ color: 'var(--ts)', fontSize: '13px' }}
+            >
+              Skip for now →
+            </a>
           </div>
         )}
 
         {step === 3 && (
           <div>
-            <h1 className="text-xl font-extrabold text-[var(--t)]">Test your overlay</h1>
-            <p className="mt-1 mb-6 text-sm text-[var(--ts)]">Make sure your overlay is open in OBS first</p>
+            <h1 className="text-xl font-extrabold text-[var(--t)]">You are almost ready!</h1>
+            <p className="mt-1 mb-6 text-sm text-[var(--ts)]">Send a test alert to make sure everything is working.</p>
 
             <button
               onClick={handleSendTestAlert}
               disabled={testStatus === 'sending'}
               className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange disabled:opacity-40 transition-opacity mb-3"
             >
-              {testStatus === 'sending' ? 'Sending…' : 'Send test alert'}
+              {testStatus === 'sending' ? 'Sending…' : 'Test my stream alert'}
             </button>
+
+            <p className="mb-3 text-xs text-center text-[var(--tm)]">
+              No OBS? You can test alerts anytime from your dashboard.
+            </p>
 
             <div className="min-h-[20px] mb-6 text-sm text-center">
               {testStatus === 'sent' && <span className="text-teal">Alert sent! Check your overlay</span>}
@@ -219,7 +237,7 @@ function SetupContent() {
               onClick={() => router.push('/dashboard')}
               className="w-full rounded-[10px] py-[14px] font-bold text-[var(--t)] bg-transparent border border-[var(--b)]"
             >
-              Go to dashboard
+              I am ready → Go to my dashboard
             </button>
           </div>
         )}
