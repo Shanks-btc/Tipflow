@@ -170,7 +170,7 @@ export default function LoginPage() {
         )}
 
         <p className="mt-6 text-center text-xs text-[var(--ts)]">
-          Fans: visit tipflow.app/tip/[streamer-name] to send a tip
+          Want to tip a streamer? Visit tipflow.xyz/tip/
         </p>
       </div>
     </main>
