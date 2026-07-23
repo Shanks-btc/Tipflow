@@ -1,7 +1,6 @@
 'use client'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMagicAuth } from '@/hooks/useMagicAuth'
 import { APP_NAME } from '@/lib/constants'
 
 // This route has no server-side data dependency, so Next.js treats it as
@@ -17,12 +16,12 @@ export const dynamic = 'force-dynamic'
 
 export default function LoginPage() {
   const router = useRouter()
-  const magicAuth = useMagicAuth()
 
   const [email, setEmail] = useState('')
   const [otpSent, setOtpSent] = useState(false)
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const refs = useRef<(HTMLInputElement | null)[]>([])
 
   // Safety: ensure error is always a displayable string
@@ -35,12 +34,21 @@ export default function LoginPage() {
   const handleSendOTP = async () => {
     if (!email) return
     setError(null)
+    setLoading(true)
     try {
-      await magicAuth.sendOTP(email)
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to send the login code')
       setOtpSent(true)
       setTimeout(() => refs.current[0]?.focus(), 0)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send the login code')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -60,21 +68,20 @@ export default function LoginPage() {
 
   const handleVerify = async () => {
     setError(null)
+    setLoading(true)
     try {
-      await magicAuth.verifyOTP(email, digits.join(''))
-      // /api/auth/login no longer takes a client-supplied address — it
-      // reads the caller's verified Supabase session directly and derives
-      // the same deterministic wallet server-side (see
-      // lib/walletDerivation.ts), so there's nothing left for the client
-      // to assert here.
-      const res = await fetch('/api/auth/login', { method: 'POST' })
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: digits.join('') }),
+      })
       const data = await res.json()
-      // tipflow_session only holds the wallet address — /setup needs email
-      // too (to create the streamers row on first login), so it rides
-      // along as a query param for this one redirect.
-      router.push(data.exists ? '/dashboard' : `/setup?email=${encodeURIComponent(email)}`)
+      if (!res.ok) throw new Error(data.error || 'Failed to verify the code')
+      router.push(data.redirect)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to verify the code')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -126,10 +133,10 @@ export default function LoginPage() {
         {!otpSent ? (
           <button
             onClick={handleSendOTP}
-            disabled={!email || magicAuth.loading}
+            disabled={!email || loading}
             className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange disabled:opacity-40 transition-opacity"
           >
-            {magicAuth.loading ? 'Sending…' : 'Continue with email'}
+            {loading ? 'Sending…' : 'Continue with email'}
           </button>
         ) : (
           <>
@@ -154,10 +161,10 @@ export default function LoginPage() {
             </div>
             <button
               onClick={handleVerify}
-              disabled={!complete || magicAuth.loading}
+              disabled={!complete || loading}
               className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange disabled:opacity-40 transition-opacity"
             >
-              {magicAuth.loading ? 'Verifying…' : 'Verify and sign in'}
+              {loading ? 'Verifying…' : 'Verify and sign in'}
             </button>
           </>
         )}

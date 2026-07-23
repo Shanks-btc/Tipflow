@@ -38,3 +38,31 @@ export function deriveWalletFromUserId(userId: string): { address: string; priva
   const wallet = Wallet.fromPhrase(mnemonic)
   return { address: wallet.address, privateKey: wallet.privateKey }
 }
+
+// Same construction as deriveWalletFromUserId, keyed on email instead of a
+// Supabase Auth user id — used by the custom Resend-based OTP flow
+// (api/auth/send-otp, api/auth/verify-otp), which never creates a real
+// Supabase Auth session and so has no user id to derive from. Normalizing
+// the email (lowercase + trim) before hashing means "User@Example.com" and
+// "user@example.com" always derive the same wallet.
+//
+// IMPORTANT: this is a deliberately different derivation input (email, not
+// user id) from deriveWalletFromUserId — the same person authenticating
+// through the Supabase-session path (fan tip flow, useMagicAuth.ts) versus
+// this custom-OTP path (streamer /login) will get two different wallet
+// addresses for the same email, since HMAC(secret, email) !=
+// HMAC(secret, userId) even for the matching account. That's a known,
+// currently-unresolved gap between the two auth paths, not an oversight —
+// reconciling it means migrating one flow to match the other, which is a
+// separate, deliberate decision beyond this change.
+export function deriveWalletFromEmail(email: string): { address: string; privateKey: string } {
+  const secret = process.env.WALLET_DERIVATION_SECRET
+  if (!secret) {
+    throw new Error('WALLET_DERIVATION_SECRET is not set in the server environment')
+  }
+  const normalized = email.toLowerCase().trim()
+  const entropy = createHmac('sha256', secret).update(normalized).digest()
+  const mnemonic = Mnemonic.entropyToPhrase(entropy)
+  const wallet = Wallet.fromPhrase(mnemonic)
+  return { address: wallet.address, privateKey: wallet.privateKey }
+}
