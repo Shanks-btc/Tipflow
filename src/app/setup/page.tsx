@@ -206,7 +206,7 @@ function SetupContent() {
               className="mt-3 block text-center"
               style={{ color: 'var(--ts)', fontSize: '13px' }}
             >
-              Skip for now →
+              Skip for now
             </a>
           </div>
         )}
@@ -237,7 +237,7 @@ function SetupContent() {
               onClick={() => router.push('/dashboard')}
               className="w-full rounded-[10px] py-[14px] font-bold text-[var(--t)] bg-transparent border border-[var(--b)]"
             >
-              I am ready → Go to my dashboard
+              Go to my dashboard
             </button>
           </div>
         )}

@@ -256,7 +256,7 @@ export default function TipTestPage() {
               onClick={handleGenerateWallet}
               className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange transition-opacity"
             >
-              Generate Test Wallet →
+              Generate Test Wallet
             </button>
           </div>
         )}
@@ -292,13 +292,13 @@ export default function TipTestPage() {
               onClick={handleContinueToWallet}
               className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange transition-opacity"
             >
-              Continue to Universal Account test →
+              Continue to Universal Account test
             </button>
             <button
               onClick={handleGenerateDifferent}
               className="mt-3 text-xs text-[var(--ts)] hover:text-[var(--t)]"
             >
-              ← Generate a different wallet
+              Generate a different wallet
             </button>
           </div>
         )}
@@ -351,7 +351,7 @@ export default function TipTestPage() {
               disabled={!recipient || sending || particleUA.loading}
               className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange disabled:opacity-40 transition-opacity"
             >
-              Send $1 test tip →
+              Send $1 test tip
             </button>
           </div>
         )}
@@ -372,9 +372,9 @@ export default function TipTestPage() {
             <p className="mt-1 mb-5 text-sm text-[var(--ts)]">Processing via Particle Universal Accounts</p>
             <div className="bg-s1 border border-[var(--b)] rounded-full px-4 py-2 text-xs font-mono flex items-center gap-2">
               <span className="text-[var(--ts)]">BSC</span>
-              <span className="text-[var(--tm)]">→</span>
+              <span className="text-[var(--tm)]">·</span>
               <span className="text-orange">Particle UA</span>
-              <span className="text-[var(--tm)]">→</span>
+              <span className="text-[var(--tm)]">·</span>
               <span className="text-teal">Arbitrum</span>
             </div>
           </div>
@@ -412,7 +412,7 @@ export default function TipTestPage() {
                 rel="noopener noreferrer"
                 className="block mb-4 text-orange text-sm underline"
               >
-                View on Arbiscan →
+                View on Arbiscan
               </a>
             ) : (
               <a
@@ -421,7 +421,7 @@ export default function TipTestPage() {
                 rel="noopener noreferrer"
                 className="block mb-4 text-orange text-sm underline"
               >
-                View on UniversalX (on-chain hash still resolving) →
+                View on UniversalX (on-chain hash still resolving)
               </a>
             )}
 

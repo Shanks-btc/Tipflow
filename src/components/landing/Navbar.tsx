@@ -193,7 +193,7 @@ export default function Navbar() {
               textAlign: 'center',
             }}
           >
-            Create your free tip link →
+            Create your free tip link
           </Link>
         </div>
       )}

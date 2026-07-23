@@ -71,7 +71,7 @@ function SendButton() {
       className="w-full rounded-[10px] font-bold text-white text-center"
       style={{ background: '#F97316', padding: '13px 0' }}
     >
-      Send $5 →
+      Send $5
     </div>
   )
 }
@@ -256,7 +256,7 @@ export function Hero() {
           <p className="mt-4 max-w-[520px] mx-auto lg:mx-0 text-[var(--ts)] text-base">
             No MetaMask. No PayPal. No wallet setup.
             <br />
-            Fans anywhere in the world tip with just their email —
+            Fans anywhere in the world tip with just their email,
             <br />
             you get paid in 8 seconds.
           </p>
@@ -265,7 +265,7 @@ export function Hero() {
               href="/login"
               className="btn-primary w-full sm:w-auto rounded-[10px] py-[14px] px-6 font-bold text-white bg-orange text-center"
             >
-              Get your free tip link →
+              Get your free tip link
             </a>
             <a
               href="#how-it-works"

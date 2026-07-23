@@ -59,7 +59,7 @@ export function EmailModal({ amount, streamerName, email, onEmailChange, onConti
         {loading ? 'Sending code…' : 'Continue'}
       </button>
       <button onClick={onBack} disabled={loading} className="mt-3 text-xs text-[var(--ts)] hover:text-[var(--t)] disabled:opacity-40">
-        ← Back
+        Back
       </button>
     </div>
   )

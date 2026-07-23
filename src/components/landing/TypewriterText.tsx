@@ -1,53 +1,38 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-type Phase = 'waiting' | 'typing' | 'pausing' | 'deleting' | 'resting'
-
 export default function TypewriterText({
   text,
+  delay = 80,
   style
 }: {
   text: string
+  delay?: number
   style?: React.CSSProperties
 }) {
   const [displayed, setDisplayed] = useState('')
-  const [phase, setPhase] = useState<Phase>('waiting')
+  const [showCursor, setShowCursor] = useState(true)
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout
-
-    if (phase === 'waiting') {
-      timeout = setTimeout(() => setPhase('typing'), 1500)
-    }
-
-    else if (phase === 'typing') {
-      if (displayed.length < text.length) {
-        timeout = setTimeout(() => {
-          setDisplayed(text.slice(0, displayed.length + 1))
-        }, 80)
+    let i = 0
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayed(text.slice(0, i + 1))
+        i++
       } else {
-        timeout = setTimeout(() => setPhase('pausing'), 2000)
+        clearInterval(timer)
+        // Text is fully typed — stop here, cursor keeps blinking
       }
-    }
+    }, delay)
+    return () => clearInterval(timer)
+  }, [text, delay])
 
-    else if (phase === 'pausing') {
-      setPhase('deleting')
-    }
-
-    else if (phase === 'deleting') {
-      if (displayed.length > 0) {
-        timeout = setTimeout(() => {
-          setDisplayed(prev => prev.slice(0, -1))
-        }, 40)
-      } else {
-        timeout = setTimeout(() => setPhase('typing'), 1000)
-      }
-    }
-
-    return () => clearTimeout(timeout)
-  }, [phase, displayed, text])
-
-  const showCursor = phase === 'typing' || phase === 'deleting'
+  useEffect(() => {
+    const cursor = setInterval(() => {
+      setShowCursor(prev => !prev)
+    }, 530)
+    return () => clearInterval(cursor)
+  }, [])
 
   return (
     <span style={style}>

@@ -139,7 +139,7 @@ export default function LoginPage() {
             disabled={!email || loading}
             className="w-full rounded-[10px] py-[14px] font-bold text-white bg-orange disabled:opacity-40 transition-opacity"
           >
-            {loading ? 'Sending…' : 'Continue with email →'}
+            {loading ? 'Sending…' : 'Continue with email'}
           </button>
         ) : (
           <>

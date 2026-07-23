@@ -20,7 +20,7 @@ export function CTABand() {
           className="btn-primary w-full min-[640px]:w-auto rounded-[10px] text-base font-bold text-white bg-orange text-center shrink-0"
           style={{ padding: '16px 32px' }}
         >
-          Start for free →
+          Start for free
         </a>
       </div>
     </section>

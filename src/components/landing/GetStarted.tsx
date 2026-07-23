@@ -96,7 +96,7 @@ export default function GetStarted() {
                   className="hidden-mobile"
                   style={{ color: 'var(--or)', fontSize: '20px', padding: '0 12px', flexShrink: 0, alignItems: 'center' }}
                 >
-                  →
+                  ·
                 </div>
               )}
             </Fragment>
@@ -118,12 +118,12 @@ export default function GetStarted() {
               marginBottom: '16px',
             }}
           >
-            Create your free tip link →
+            Create your free tip link
           </Link>
           <p style={{ fontSize: '13px', color: 'var(--ts)' }}>
             Already have an account?{' '}
             <Link href="/login" style={{ color: 'var(--or)', textDecoration: 'none', fontWeight: '600' }}>
-              Log in →
+              Log in
             </Link>
           </p>
         </div>

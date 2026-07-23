@@ -97,21 +97,6 @@ export default function ProblemStatement() {
             </div>
           ))}
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '12px',
-              fontSize: '16px',
-              fontWeight: '700',
-              color: 'var(--or)',
-            }}
-          >
-            <span>Tipflow solves all three</span>
-            <span style={{ fontSize: '20px' }}>↓</span>
-          </div>
-        </div>
       </div>
     </section>
   )
