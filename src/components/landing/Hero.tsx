@@ -240,7 +240,7 @@ export function Hero() {
               className="w-1.5 h-1.5 rounded-full"
               style={{ background: '#34D399', animation: 'pulseDot 1.6s ease-in-out infinite' }}
             />
-            Settles on Arbitrum · Instant · Onchain
+            Settles on Arbitrum
           </div>
 
           <h1 className="font-extrabold text-[32px] md:text-[36px] lg:text-[48px] leading-[1.05] text-[var(--t)]">
@@ -250,7 +250,6 @@ export function Hero() {
             <br />
             <TypewriterText
               text="Zero friction."
-              delay={80}
               style={{ color: 'var(--or)', textShadow: '0 0 40px rgba(249,115,22,0.3)' }}
             />
           </h1>

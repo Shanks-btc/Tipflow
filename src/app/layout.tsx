@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Tipflow — Tip any streamer. Instantly.',
+  title: 'Tip any streamer Instantly.',
   description:
     'Fans tip live streamers using only their email. No wallet. No MetaMask. No gas. No seed phrases.',
 }
