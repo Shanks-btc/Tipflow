@@ -168,10 +168,6 @@ export default function LoginPage() {
             </button>
           </>
         )}
-
-        <p className="mt-6 text-center text-xs text-[var(--ts)]">
-          Want to tip a streamer? Visit tipflow.xyz/tip/
-        </p>
       </div>
     </main>
   )

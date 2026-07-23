@@ -38,8 +38,8 @@ export default function SolutionCards() {
   ]
 
   return (
-    <section style={{ background: 'var(--bg)', padding: '80px 0' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 48px' }}>
+    <section className="py-12 md:py-20" style={{ background: 'var(--bg)' }}>
+      <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
             fontSize: '28px',
@@ -64,13 +64,7 @@ export default function SolutionCards() {
         >
           We rebuilt tipping from scratch using Magic, Particle Universal Accounts and Arbitrum.
         </p>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '16px',
-          }}
-        >
+        <div className="grid grid-cols-1 min-[640px]:grid-cols-3" style={{ gap: '16px' }}>
           {solutions.map((s) => (
             <div
               key={s.title}

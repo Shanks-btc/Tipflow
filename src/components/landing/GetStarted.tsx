@@ -22,8 +22,8 @@ export default function GetStarted() {
   ]
 
   return (
-    <section style={{ background: 'var(--s1)', padding: '80px 0', borderTop: '1px solid var(--b)' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 48px' }}>
+    <section className="py-12 md:py-20" style={{ background: 'var(--s1)', borderTop: '1px solid var(--b)' }}>
+      <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
             fontSize: '32px',
@@ -49,27 +49,19 @@ export default function GetStarted() {
           No credit card. No wallet. Just your email.
         </p>
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0',
-            maxWidth: '800px',
-            margin: '0 auto 48px',
-            flexWrap: 'wrap',
-          }}
+          className="flex flex-col gap-4 sm:flex-row sm:gap-0 sm:items-center sm:justify-center"
+          style={{ maxWidth: '800px', margin: '0 auto 48px' }}
         >
           {steps.map((step, i) => (
             <Fragment key={step.n}>
               <div
+                className="w-full sm:flex-1 sm:min-w-[200px]"
                 style={{
                   background: 'var(--s2)',
                   border: '1px solid var(--b)',
                   borderRadius: '12px',
                   padding: '28px 24px',
                   textAlign: 'center',
-                  flex: '1',
-                  minWidth: '200px',
                 }}
               >
                 <div
@@ -94,7 +86,12 @@ export default function GetStarted() {
                 <p style={{ fontSize: '13px', color: 'var(--ts)', lineHeight: '1.6', margin: 0 }}>{step.text}</p>
               </div>
               {i < steps.length - 1 && (
-                <div style={{ color: 'var(--or)', fontSize: '20px', padding: '0 12px', flexShrink: 0 }}>→</div>
+                <div
+                  className="hidden-mobile"
+                  style={{ color: 'var(--or)', fontSize: '20px', padding: '0 12px', flexShrink: 0, alignItems: 'center' }}
+                >
+                  →
+                </div>
               )}
             </Fragment>
           ))}

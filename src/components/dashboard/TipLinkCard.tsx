@@ -7,7 +7,7 @@ interface TipLinkCardProps {
 
 export function TipLinkCard({ username }: TipLinkCardProps) {
   const [copied, setCopied] = useState(false)
-  const url = `tipflow.app/tip/${username}`
+  const url = `tipflow.xyz/tip/${username}`
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(url)

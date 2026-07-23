@@ -16,8 +16,8 @@ export default function WhyDifferent() {
   ]
 
   return (
-    <section style={{ background: 'var(--s1)', padding: '80px 0' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 48px' }}>
+    <section className="py-12 md:py-20" style={{ background: 'var(--s1)' }}>
+      <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
             fontSize: '28px',
@@ -42,13 +42,7 @@ export default function WhyDifferent() {
         >
           Tipflow handles all the complexity. Fans just use email.
         </p>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-            gap: '16px',
-          }}
-        >
+        <div className="grid grid-cols-1 min-[640px]:grid-cols-3" style={{ gap: '16px' }}>
           {cards.map((c) => (
             <div
               key={c.title}

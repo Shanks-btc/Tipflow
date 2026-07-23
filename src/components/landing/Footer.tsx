@@ -28,12 +28,11 @@ export default function Footer() {
   ]
 
   return (
-    <footer style={{ background: '#060609', borderTop: '1px solid var(--b)', padding: '48px 0 24px' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 48px' }}>
+    <footer className="pt-8 pb-6 md:pt-12" style={{ background: '#060609', borderTop: '1px solid var(--b)' }}>
+      <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div
+          className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_1fr]"
           style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr 1fr',
             gap: '40px',
             marginBottom: '48px',
           }}

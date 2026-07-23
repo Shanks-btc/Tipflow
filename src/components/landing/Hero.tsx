@@ -6,15 +6,13 @@ import LiveDot from '@/components/shared/LiveDot'
 // dependencies — every "button" here is a styled <div>, not a real
 // interactive element.
 //
-// Three variants render across the responsive range (see Hero() below for
+// Two variants render across the responsive range (see Hero() below for
 // which breakpoints show which):
 //   - Desktop (lg+): full card + floating alert card, side-by-side with
 //     the headline text.
 //   - Tablet (md-lg): the same full card, no alert card, stacked below
 //     the CTAs instead of beside the text.
-//   - Mobile (<md): a reduced card (no "choose an amount" label, no
-//     footer line, no alert card) stacked below the CTAs, with a further
-//     size step below 375px.
+//   - Mobile (<md): no product preview at all — text-only hero.
 
 function StreamerRow() {
   return (
@@ -43,17 +41,13 @@ function StreamerRow() {
   )
 }
 
-// The max-[374px]: font step only ever matters inside MobileTipCardPreview
-// (the only variant visible below 375px) — harmless to include here
-// unconditionally since AmountGrid is shared with the tablet/desktop card,
-// which is hidden below md=768px regardless.
 function AmountGrid() {
   return (
     <div className="grid grid-cols-2 gap-2 mb-4">
       {[1, 3, 5, 10].map((amount) => (
         <div
           key={amount}
-          className="rounded-[10px] py-3 text-center font-black text-[20px] max-[374px]:text-[16px]"
+          className="rounded-[10px] py-3 text-center font-black text-[20px]"
           style={
             amount === 5
               ? { background: 'rgba(249,115,22,0.11)', border: '1px solid rgba(249,115,22,0.25)', color: '#F97316' }
@@ -99,20 +93,6 @@ function TipCardPreview() {
   )
 }
 
-// Mobile only — reduced content, no label, no footer line.
-function MobileTipCardPreview() {
-  return (
-    <div
-      className="rounded-xl p-4 max-[374px]:p-3"
-      style={{ background: '#18181F', border: '1px solid rgba(255,255,255,0.07)' }}
-    >
-      <StreamerRow />
-      <AmountGrid />
-      <SendButton />
-    </div>
-  )
-}
-
 function AlertCardPreview() {
   return (
     <div
@@ -148,9 +128,9 @@ function AlertCardPreview() {
 
 export function Hero() {
   return (
-    <section className="pt-12 pb-14 md:pt-16 md:pb-20">
-      <div className="mx-auto max-w-[1280px] px-4 lg:flex lg:items-center lg:gap-12">
-        <div className="lg:w-[52%]">
+    <section className="pt-12 pb-12 md:pt-16 md:pb-20">
+      <div className="mx-auto max-w-[1280px] px-5 md:px-4 lg:flex lg:items-center lg:gap-12">
+        <div className="lg:w-[52%] text-center lg:text-left">
           <div
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 mb-5 text-teal"
             style={{ background: 'var(--tld)', border: '1px solid var(--tlb)', fontSize: 11, fontWeight: 600 }}
@@ -162,7 +142,7 @@ export function Hero() {
             Powered by Magic · Particle Universal Accounts · Arbitrum
           </div>
 
-          <h1 className="font-extrabold text-[36px] sm:text-[40px] lg:text-[48px] leading-[1.05] text-[var(--t)]">
+          <h1 className="font-extrabold text-[32px] md:text-[36px] lg:text-[48px] leading-[1.05] text-[var(--t)]">
             Fans anywhere.
             <br />
             Tips instantly.
@@ -171,7 +151,7 @@ export function Hero() {
               Zero friction.
             </span>
           </h1>
-          <p className="mt-4 max-w-[520px] text-[var(--ts)] text-base">
+          <p className="mt-4 max-w-[520px] mx-auto lg:mx-0 text-[var(--ts)] text-base">
             No MetaMask. No PayPal. No wallet setup.
             <br />
             Fans anywhere in the world tip with just their email —
@@ -181,13 +161,13 @@ export function Hero() {
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <a
               href="/login"
-              className="rounded-[10px] py-[14px] px-6 font-bold text-white bg-orange text-center"
+              className="w-full sm:w-auto rounded-[10px] py-[14px] px-6 font-bold text-white bg-orange text-center"
             >
               Get your free tip link →
             </a>
             <a
               href="#how-it-works"
-              className="rounded-[10px] font-bold text-[var(--t)] bg-transparent text-center"
+              className="w-full sm:w-auto rounded-[10px] font-bold text-[var(--t)] bg-transparent text-center"
               style={{ border: '1.5px solid rgba(255,255,255,0.25)', padding: '13px 22px' }}
             >
               See how it works
@@ -195,7 +175,10 @@ export function Hero() {
           </div>
           <p className="mt-4 text-xs text-[var(--tm)]">Free to start · 1% per tip · Withdraw anytime</p>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '32px', flexWrap: 'wrap' }}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '32px', flexWrap: 'wrap' }}
+            className="justify-center lg:justify-start"
+          >
             <span style={{ fontSize: '12px', color: 'var(--ts)' }}>Built with:</span>
             {['Particle Network', 'Magic', 'Arbitrum', 'EIP-7702'].map((b) => (
               <span
@@ -220,10 +203,7 @@ export function Hero() {
             <TipCardPreview />
           </div>
 
-          {/* Mobile (<768px): reduced card, stacked below the CTAs. */}
-          <div className="md:hidden" style={{ marginTop: 32 }}>
-            <MobileTipCardPreview />
-          </div>
+          {/* Mobile (<768px): product preview hidden completely — text-only hero. */}
         </div>
 
         {/* Desktop (1024px+): full card + floating alert, beside the text. */}

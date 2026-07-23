@@ -105,3 +105,24 @@ input::placeholder, textarea::placeholder {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.3); }
 }
+
+/* Navbar.tsx desktop/mobile toggle — .show-mobile also sets its own
+   flexDirection inline where it needs vertical stacking (the dropdown
+   menu), since this rule only controls display, not layout direction. */
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+  .show-mobile {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-mobile {
+    display: none !important;
+  }
+  .hidden-mobile {
+    display: flex !important;
+  }
+}

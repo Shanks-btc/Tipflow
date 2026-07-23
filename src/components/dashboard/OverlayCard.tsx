@@ -9,7 +9,7 @@ interface OverlayCardProps {
 export function OverlayCard({ username }: OverlayCardProps) {
   const [copied, setCopied] = useState(false)
   const [testStatus, setTestStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
-  const url = `tipflow.app/overlay/${username}`
+  const url = `tipflow.xyz/overlay/${username}`
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(url)

@@ -10,7 +10,7 @@ const CREATOR_STEPS = [
   {
     number: '02',
     title: 'Share your link',
-    description: 'Post tipflow.app/tip/you on Twitch, YouTube, X or Discord.',
+    description: 'Post tipflow.xyz/tip/you on Twitch, YouTube, X or Discord.',
   },
   {
     number: '03',

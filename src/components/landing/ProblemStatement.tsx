@@ -35,8 +35,8 @@ export default function ProblemStatement() {
   ]
 
   return (
-    <section style={{ background: '#0D0D14', padding: '80px 0' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 48px' }}>
+    <section className="py-12 md:py-20" style={{ background: '#0D0D14' }}>
+      <div className="px-5 md:px-12" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <h2
           style={{
             fontSize: '28px',
@@ -61,14 +61,7 @@ export default function ProblemStatement() {
         >
           Fans want to support their favourite creators. The platforms make it nearly impossible.
         </p>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '16px',
-            marginBottom: '48px',
-          }}
-        >
+        <div className="grid grid-cols-1 min-[640px]:grid-cols-3" style={{ gap: '16px', marginBottom: '48px' }}>
           {problems.map((p) => (
             <div
               key={p.title}

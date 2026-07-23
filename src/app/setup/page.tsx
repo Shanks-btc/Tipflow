@@ -75,7 +75,7 @@ function SetupContent() {
     }
   }
 
-  const overlayUrl = `tipflow.app/overlay/${username.toLowerCase()}`
+  const overlayUrl = `tipflow.xyz/overlay/${username.toLowerCase()}`
 
   const handleCopyOverlayUrl = async () => {
     await navigator.clipboard.writeText(overlayUrl)
@@ -111,7 +111,7 @@ function SetupContent() {
           <div>
             <h1 className="text-xl font-extrabold text-[var(--t)]">Choose your username</h1>
             <p className="mt-1 mb-5 text-sm text-[var(--ts)]">
-              This is your public tip link — tipflow.app/tip/[your-username]
+              This is your public tip link — tipflow.xyz/tip/[your-username]
             </p>
 
             <input
