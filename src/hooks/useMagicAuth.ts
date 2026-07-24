@@ -1,7 +1,6 @@
 'use client'
 import { useCallback, useState } from 'react'
 import { JsonRpcProvider, Wallet } from 'ethers'
-import { createClient } from '@/lib/supabase'
 import { createUserSigner } from '@/lib/magic'
 import { ARBITRUM_RPC } from '@/lib/constants'
 import type { TipSigner } from '@/lib/tipSigner'
@@ -13,7 +12,9 @@ import type { TipSigner } from '@/lib/tipSigner'
 // wallet in testWalletSigner.ts, which is explicitly test-funds-only and
 // shown to the user with a "never use in production" warning). It only
 // ever lives in memory for the current page load; a fresh load re-fetches
-// it from the server, authenticated via the live Supabase session.
+// it from the server, authenticated either by a just-verified OTP code
+// (verifyOTP, the fan flow) or an existing session (fetchWallet, used by
+// the streamer dashboard's withdrawal flow).
 let cachedWallet: Wallet | null = null
 
 export function useMagicAuth() {
@@ -21,25 +22,27 @@ export function useMagicAuth() {
   const [address, setAddress] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Uses the same Resend-based OTP system as the streamer login flow
+  // (api/auth/send-otp, api/auth/verify-otp) — Supabase's own built-in
+  // email OTP (supabase.auth.signInWithOtp) has broken SMTP in this
+  // project and reliably 500s, which is what was surfacing as the "{}"
+  // error on the tip page (a failed-request object rendered straight into
+  // JSX). Fans still have to prove they own the email they type in before
+  // their deterministic wallet's private key is handed back — that proof
+  // is what makes it safe to let this wallet sign a real on-chain
+  // transaction; nothing here removes that check, it just fixes what was
+  // actually sending it.
   const sendOTP = useCallback(async (email: string): Promise<void> => {
     setLoading(true)
     setError(null)
     try {
-      const supabase = createClient()
-      // emailRedirectTo is intentionally omitted (not merely undefined —
-      // see below) so Supabase has no confirmation link to build from the
-      // client side. That alone doesn't guarantee a code-only email: the
-      // active email template in the Supabase dashboard is what actually
-      // decides whether {{ .ConfirmationURL }} (a link) or {{ .Token }}
-      // (the 6-digit code) gets shown — see Authentication → Email
-      // Templates. A template referencing .ConfirmationURL will still
-      // render a link even with no emailRedirectTo here, because Supabase
-      // falls back to the project's configured Site URL.
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: true },
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       })
-      if (otpError) throw new Error(otpError.message)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to send the login code')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to send the login code'
       setError(message)
@@ -71,18 +74,18 @@ export function useMagicAuth() {
     setLoading(true)
     setError(null)
     try {
-      const supabase = createClient()
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: 'email',
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: otp }),
       })
-      if (verifyError) throw new Error(verifyError.message)
-      if (!data.user) throw new Error('Login failed — no user returned')
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to verify the code')
 
-      const wallet = await fetchWallet()
-      setAddress(wallet.address)
-      return wallet.address
+      const provider = new JsonRpcProvider(ARBITRUM_RPC)
+      cachedWallet = new Wallet(data.privateKey, provider)
+      setAddress(data.address)
+      return data.address
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to verify the code'
       setError(message)
@@ -90,7 +93,7 @@ export function useMagicAuth() {
     } finally {
       setLoading(false)
     }
-  }, [fetchWallet])
+  }, [])
 
   const getAddress = useCallback(async (): Promise<string> => {
     const wallet = await fetchWallet()
@@ -104,8 +107,7 @@ export function useMagicAuth() {
   }, [])
 
   const logout = useCallback(async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
     cachedWallet = null
     setAddress(null)
     setError(null)

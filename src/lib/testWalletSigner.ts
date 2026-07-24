@@ -11,6 +11,15 @@ import type { AuthorizationSignature, TipSigner } from './tipSigner'
 const STORAGE_KEY_PRIVATE = 'tipflow_dev_wallet_key'
 const STORAGE_KEY_ADDRESS = 'tipflow_dev_wallet_address'
 
+// Gate for the real /tip/[username] page's local-test-wallet mode
+// (TipCard.tsx): true only on localhost/127.0.0.1, so the no-OTP,
+// anyone-can-sign-anything test path can never be reached on the real
+// deployed site (tipflow.xyz), regardless of what a client sends.
+export function isLocalhost(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+}
+
 // Persists the fallback wallet in localStorage so it's the SAME wallet
 // across page reloads and "Try again" clicks — fund it once, keep reusing
 // it, until clearPersistedTestWallet() is called explicitly. Callers gate

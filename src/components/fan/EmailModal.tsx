@@ -8,9 +8,9 @@ interface EmailModalProps {
   loading?: boolean
 }
 
-// Supabase email OTP login. onContinue (implemented in TipCard) calls
-// useMagicAuth().sendOTP(email) — this component just owns the input UI
-// and shows a loading state while that request is in flight.
+// Resend-based email OTP (see useMagicAuth.ts). onContinue (implemented in
+// TipCard) calls useMagicAuth().sendOTP(email) — this component just owns
+// the input UI and shows a loading state while that request is in flight.
 export function EmailModal({ amount, streamerName, email, onEmailChange, onContinue, onBack, loading }: EmailModalProps) {
   const handleContinue = () => {
     if (!email || loading) return

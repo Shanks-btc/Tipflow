@@ -41,7 +41,7 @@ app.post('/webhook', async (req, res) => {
     const { data: streamer } = await supabase
       .from('streamers')
       .select('id, username, display_name')
-      .eq('ua_address', event.toAddress.toLowerCase())
+      .ilike('ua_address', event.toAddress)
       .single()
 
     if (!streamer) continue

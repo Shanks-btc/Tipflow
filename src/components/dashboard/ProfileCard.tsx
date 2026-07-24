@@ -106,7 +106,7 @@ export function ProfileCard({ displayName, username, alertDuration, minTipAmount
             alignItems: 'center',
           }}
         >
-          View my page
+          My tip page
         </a>
         <button
           onClick={() => setShowSettings(true)}

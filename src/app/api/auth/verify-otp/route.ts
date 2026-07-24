@@ -47,6 +47,12 @@ export async function POST(req: Request) {
   return NextResponse.json({
     success: true,
     address: wallet.address,
+    // Only ever returned to the request that just supplied a valid,
+    // unexpired, single-use code for this exact email — same trust model
+    // as POST /api/auth/wallet (which also hands the raw key back to a
+    // just-verified caller). The fan tip flow (useMagicAuth.ts) relies on
+    // this to sign on-chain transactions without a second round trip.
+    privateKey: wallet.privateKey,
     redirect: streamer ? '/dashboard' : `/setup?email=${encodeURIComponent(email)}`,
   })
 }

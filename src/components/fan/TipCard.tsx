@@ -1,7 +1,9 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMagicAuth } from '@/hooks/useMagicAuth'
 import { useParticleUA } from '@/hooks/useParticleUA'
+import { createTestWalletSigner, getOrCreatePersistedTestWallet, isLocalhost } from '@/lib/testWalletSigner'
+import type { TipSigner } from '@/lib/tipSigner'
 import type { Streamer } from '@/lib/streamers'
 import StreamerCard from './StreamerCard'
 import AmountSelector from './AmountSelector'
@@ -36,6 +38,17 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
   const magicAuth = useMagicAuth()
   const particleUA = useParticleUA()
 
+  // Dev/localhost only — see lib/testWalletSigner.ts. When true, the email
+  // step skips OTP entirely and signs with a reusable local wallet instead
+  // of the real email-derived one, so the flow can be exercised end to end
+  // without a working Resend send. Starts false so SSR/first paint always
+  // matches the real (production-safe) flow; isLocalhost() only resolves
+  // client-side, right after mount.
+  const [localMode, setLocalMode] = useState(false)
+  useEffect(() => {
+    setLocalMode(isLocalhost())
+  }, [])
+
   const [step, setStep] = useState<TipCardStep>('select')
   const [amount, setAmount] = useState<number | null>(null)
   const [message] = useState('')
@@ -51,31 +64,16 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
   const hasSentRef = useRef(false)
 
   const displayName = initialStreamer?.display_name ?? username.charAt(0).toUpperCase() + username.slice(1)
+  const visibleSteps = localMode ? PROGRESS_STEPS.filter((s) => s !== 'otp') : PROGRESS_STEPS
 
   const handleSelectAmount = (n: number) => {
     setAmount(n)
     setStep('email')
   }
 
-  const handleSendOTP = async () => {
-    setAuthError(null)
-    try {
-      await magicAuth.sendOTP(email)
-      setStep('otp')
-    } catch (err) {
-      setAuthError(err instanceof Error ? err.message : 'Failed to send the login code')
-    }
-  }
-
-  const handleVerifyOTP = async (otp: string) => {
-    setAuthError(null)
-    try {
-      await magicAuth.verifyOTP(email, otp)
-    } catch (err) {
-      setAuthError(err instanceof Error ? err.message : 'Failed to verify the code')
-      return
-    }
-
+  // Shared by both the real (OTP-verified) signer and the local test
+  // wallet — everything past "we have a signer" is identical either way.
+  const executeTip = async (signer: TipSigner) => {
     if (hasSentRef.current) return
     hasSentRef.current = true
 
@@ -90,7 +88,6 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
     setStep('sending')
     const startedAt = Date.now()
     try {
-      const signer = magicAuth.getSigner()
       const id = await particleUA.sendTip({
         signer,
         streamerUA: initialStreamer.ua_address,
@@ -121,9 +118,39 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
     }
   }
 
+  const handleContinueEmail = async () => {
+    if (localMode) {
+      // Local test mode: email is receipt-only, no verification — sign
+      // with a reusable local wallet instead (fund it once on localhost;
+      // see getOrCreatePersistedTestWallet's comment).
+      const wallet = getOrCreatePersistedTestWallet()
+      await executeTip(createTestWalletSigner(wallet))
+      return
+    }
+
+    setAuthError(null)
+    try {
+      await magicAuth.sendOTP(email)
+      setStep('otp')
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Failed to send the login code')
+    }
+  }
+
+  const handleVerifyOTP = async (otp: string) => {
+    setAuthError(null)
+    try {
+      await magicAuth.verifyOTP(email, otp)
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Failed to verify the code')
+      return
+    }
+    await executeTip(magicAuth.getSigner())
+  }
+
   const handleReset = async () => {
     hasSentRef.current = false
-    await magicAuth.logout()
+    if (!localMode) await magicAuth.logout()
     setStep('select')
     setAmount(null)
     setEmail('')
@@ -138,7 +165,17 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
     setStep('select')
   }
 
-  const stepIndex = step === 'error' ? PROGRESS_STEPS.indexOf('otp') : PROGRESS_STEPS.indexOf(step)
+  const errorFallbackStep = localMode ? 'email' : 'otp'
+  const stepIndex = step === 'error' ? visibleSteps.indexOf(errorFallbackStep) : visibleSteps.indexOf(step)
+
+  // Safety: ensure these are always displayable strings, never a raw {}
+  // or [object Object] rendered straight into JSX.
+  const displayAuthError =
+    authError && typeof authError === 'string' && authError.length > 0 && authError !== '{}' && authError !== '[object Object]'
+      ? authError
+      : null
+  const displayError =
+    error && typeof error === 'string' && error.length > 0 && error !== '{}' && error !== '[object Object]' ? error : null
 
   if (!initialStreamer) {
     return (
@@ -157,7 +194,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
       />
 
       <div className="flex gap-[5px] mb-6">
-        {PROGRESS_STEPS.map((s, i) => (
+        {visibleSteps.map((s, i) => (
           <div
             key={s}
             className="h-[3px] rounded-[2px] transition-all"
@@ -169,9 +206,28 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
         ))}
       </div>
 
-      {authError && (step === 'email' || step === 'otp') && (
-        <div className="mb-4 p-3 rounded-lg border border-red-500/40 bg-red-500/10 text-red-300 text-xs font-mono whitespace-pre-wrap break-all">
-          {authError}
+      {localMode && (
+        <div
+          className="mb-4 text-center"
+          style={{ fontSize: '11px', color: 'var(--tm)' }}
+        >
+          Local test mode — reusable local wallet, no email verification (localhost only)
+        </div>
+      )}
+
+      {displayAuthError && (step === 'email' || step === 'otp') && (
+        <div
+          style={{
+            background: 'rgba(249,115,22,0.1)',
+            border: '1px solid rgba(249,115,22,0.25)',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            color: 'var(--or)',
+            fontSize: '13px',
+            marginBottom: '16px',
+          }}
+        >
+          {displayAuthError}
         </div>
       )}
 
@@ -188,14 +244,14 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
           streamerName={displayName}
           email={email}
           onEmailChange={setEmail}
-          onContinue={handleSendOTP}
+          onContinue={handleContinueEmail}
           onBack={() => setStep('select')}
           loading={magicAuth.loading}
         />
       )}
 
       {step === 'otp' && (
-        <OTPModal email={email} onVerify={handleVerifyOTP} onResend={handleSendOTP} loading={magicAuth.loading} />
+        <OTPModal email={email} onVerify={handleVerifyOTP} onResend={handleContinueEmail} loading={magicAuth.loading} />
       )}
 
       {step === 'sending' && amount !== null && (
@@ -219,7 +275,7 @@ export default function TipCard({ username, initialStreamer }: TipCardProps) {
           </div>
           <h2 className="text-[22px] font-black text-red-400 mb-4">Tip failed</h2>
           <pre className="bg-s1 rounded-lg p-3 mb-4 text-left text-red-300 text-xs font-mono whitespace-pre-wrap break-all">
-            {error}
+            {displayError ?? 'Something went wrong'}
           </pre>
           <button
             onClick={handleTryAgain}

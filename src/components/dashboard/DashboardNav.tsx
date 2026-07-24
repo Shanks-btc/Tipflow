@@ -61,7 +61,7 @@ export function DashboardNav({ username, displayName, alertDuration, minTipAmoun
           className="hidden-mobile"
           style={{ fontSize: 13, color: 'var(--ts)', textDecoration: 'none' }}
         >
-          View my page
+          My tip page
         </a>
 
         <button

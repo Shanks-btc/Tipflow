@@ -4,6 +4,38 @@ import { createServiceRoleClient } from '@/lib/supabase-server'
 
 const USERNAME_PATTERN = /^[a-z0-9-]+$/i
 
+// Best-effort — the streamer row is already saved by the time this runs,
+// so a webhook/network hiccup here must never fail the setup request
+// itself (that would 500 a request that actually succeeded, and a retry
+// would then hit "username already taken"). No-ops until ALCHEMY_WEBHOOK_ID
+// and ALCHEMY_API_KEY are set (Railway env vars, not added yet).
+async function addToAlchemyWebhook(address: string): Promise<void> {
+  const webhookId = process.env.ALCHEMY_WEBHOOK_ID
+  const apiKey = process.env.ALCHEMY_API_KEY
+
+  if (!webhookId || !apiKey) return
+
+  try {
+    const res = await fetch('https://dashboard.alchemy.com/api/update-webhook-addresses', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Alchemy-Token': apiKey,
+      },
+      body: JSON.stringify({
+        webhook_id: webhookId,
+        addresses_to_add: [address],
+        addresses_to_remove: [],
+      }),
+    })
+    if (!res.ok) {
+      console.error('Alchemy webhook update failed:', res.status, await res.text().catch(() => ''))
+    }
+  } catch (err) {
+    console.error('Alchemy webhook update failed:', err)
+  }
+}
+
 // /api/auth/login never creates a streamers row on first login (it only
 // checks `exists` by email) — this is where that row actually gets
 // created, the first time someone completes the setup wizard. ua_address
@@ -60,6 +92,8 @@ export async function POST(request: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  await addToAlchemyWebhook(address)
 
   return NextResponse.json({ success: true })
 }
